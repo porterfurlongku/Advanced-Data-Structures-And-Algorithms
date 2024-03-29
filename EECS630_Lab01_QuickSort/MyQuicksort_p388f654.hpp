@@ -47,19 +47,20 @@ void PrintArray( std::vector<Comparable> & a)
 // left and right: the left and end indexes of the range of the elements to be sorted, inclusive
 // reverse: if set true, sort in descending order. Default: false
 template <typename Comparable>
-void InsertionSort(std::vector<Comparable> &a, int left, int right, bool reverse = false)
-{
-    for (int i = left + 1; i <= right; i++)
-    {
-        Comparable tmp = std::move(a[i]);
-        int j;
-        for (j = i; j > left && ((reverse && tmp > a[j - 1]) || (!reverse && tmp < a[j - 1])); j--)
-        {
-            a[j] = std::move(a[j - 1]);
+void InsertionSort(std::vector<Comparable> &a, int left, int right, bool reverse = false) {
+    for (int i = left + 1; i <= right; ++i) {
+        Comparable key = std::move(a[i]);
+        int j = i - 1;
+
+        while (j >= left && ((reverse && a[j] < key) || (!reverse && a[j] > key))) {
+            a[j + 1] = std::move(a[j]);
+            --j;
         }
-        a[j] = std::move(tmp);
+
+        a[j + 1] = std::move(key);
     }
 }
+
 
 
 // Finds the median among three elements: a[x], a[y], and a[z]
@@ -67,64 +68,73 @@ void InsertionSort(std::vector<Comparable> &a, int left, int right, bool reverse
 // x, y, z: the three indexes in the array
 // returns the index that corresponds to the median of the three
 template <typename Comparable>
-const size_t ArrayMedian3(std::vector<Comparable> &a, const size_t x, const size_t y, const size_t z)
-{
-    if (a[x] < a[y])
-    {
-        if (a[y] < a[z])
-            return y;
-        else if (a[x] < a[z])
-            return z;
-        else
-            return x;
-    }
+const size_t ArrayMedian3(std::vector<Comparable> &a, const size_t x, const size_t y, const size_t z) {
+    if ((a[x] <= a[y] && a[y] <= a[z]) || (a[z] <= a[y] && a[y] <= a[x]))
+        return y;
+    else if ((a[y] <= a[x] && a[x] <= a[z]) || (a[z] <= a[x] && a[x] <= a[y]))
+        return x;
     else
-    {
-        if (a[x] < a[z])
-            return x;
-        else if (a[y] < a[z])
-            return z;
-        else
-            return y;
-    }
+        return z;
 }
 
+
+// The partition function for the quick sort algorithm
+template <typename Comparable>
+int partition(std::vector<Comparable> &a, int left, int right, bool reverse = false) {
+    // Find the median of three elements and use it as the pivot
+    int pivotIndex = ArrayMedian3(a, left, (left + right) / 2, right);
+    Comparable pivotValue = a[pivotIndex];
+
+    // Move the pivot to the end of the array
+    std::swap(a[pivotIndex], a[right]);
+
+    // Initialize the storeIndex to the leftmost position
+    int storeIndex = left;
+
+    // If reverse is true, partition the array such that elements greater than the pivot are on the left
+    if (reverse) {
+        for (int i = left; i < right; i++) {
+            if (a[i] >= pivotValue) {
+                std::swap(a[i], a[storeIndex]);
+                storeIndex++;
+            }
+        }
+    } else {
+        // If reverse is false, partition the array such that elements less than the pivot are on the left
+        for (int i = left; i < right; i++) {
+            if (a[i] <= pivotValue) {
+                std::swap(a[i], a[storeIndex]);
+                storeIndex++;
+            }
+        }
+    }
+
+    // Move the pivot to its final place
+    std::swap(a[storeIndex], a[right]);
+
+    // Return the index of the pivot
+    return storeIndex;
+}
 
 // The recursive quick sort function
 // a: the array to be sorted
 // left and right: the indexes for the range to be sorted, inclusive
 // reverse: if set true, sort in descending order; otherwise in ascending order
+// The quicksort function that recursively sorts the elements of the array
 template <typename Comparable>
-void Quicksort(std::vector<Comparable> &a, int left, int right, bool reverse = false)
-{
-    if (left + BOUNDARY_SIZE <= right)
-    {
-        const size_t pivotIndex = ArrayMedian3(a, left, (left + right) / 2, right);
-        std::swap(a[pivotIndex], a[right - 1]); // Move pivot to the end
+void Quicksort(std::vector<Comparable> &a, int left, int right, bool reverse = false) {
+    // Base case: if the left index is no longer less than the right index, the array is sorted
+    if (left < right) {
+        // Partition the array and get the index of the pivot
+        int pivotIndex = partition(a, left, right, reverse);
 
-        int i = left, j = right - 1;
-        for (;;)
-        {
-            while ((reverse ? a[--j] < a[right - 1] : a[++i] < a[right - 1])) {}
-            while ((reverse ? a[++i] > a[right - 1] : a[--j] > a[right - 1])) {}
-            if (i < j)
-                std::swap(a[i], a[j]);
-            else
-                break;
-        }
+        // Recursively sort the left subarray, which contains elements less than the pivot
+        Quicksort(a, left, pivotIndex - 1, reverse);
 
-        std::swap(a[i], a[right - 1]); // Restore pivot
-
-        Quicksort(a, left, i - 1, reverse);
-        Quicksort(a, i + 1, right, reverse);
-    }
-    else
-    {
-        // Use insertion sort for small subarrays
-        InsertionSort(a, left, right, reverse);
+        // Recursively sort the right subarray, which contains elements greater than the pivot
+        Quicksort(a, pivotIndex + 1, right, reverse);
     }
 }
-
 
 
 // The driver quicksort function

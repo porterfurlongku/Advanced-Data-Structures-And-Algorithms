@@ -1,14 +1,13 @@
 1) Ten instances are included.
-
-      input_[1-10].txt:   the input file;
-      output_[1-10].txt:  the correct output file;
-      log_[1-10].txt:     the log file of expected running time and consume memory.
+      input_[1-10].txt:         the input file;
+      output_[1-10].txt:        the correct output file;
+      log_[1-10].txt:           the log file of expected running time and consume memory.
 
 2) Compile MainTest to test data files:
-      `g++ -std=c++11 MainTest.cpp -o Lab1`
+      `g++ -std=c++11 MainTest.cpp -o Lab3`
 
 3) You are encouraged to check time, memory:
-      /usr/bin/time -v -o Logs/log_1.txt Lab1 Inputs/input_1.txt > Results/result_1.txt
+      /usr/bin/time -v -o ${LOG_FILE} ./Lab3 ${input_[1-10].txt} > ${result_[1-10].txt}
 
 4) Comparing your result with expected output:
       python3 GradingScript.py ${result_[1-10].txt} ${output_[1-10].txt} ${YOUR_LOG_FILE} ${log_[1-10].txt} ${YOU_CPU_CLOCK_RATE}
@@ -19,3 +18,4 @@
      the expected output, the second line tells if your program runs within a proper
      amount of time, and the third line tells if your program uses a proper amount of space.
      For a completely correct run, you should see three "Yes" from the output.
+   * Keep an eye on the standard output, you need to have diff program on your system.
