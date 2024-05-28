@@ -1,1 +1,3 @@
-# EECS-630-Advanced-Data-Algorithms-Structures-And-Algorithms
+# Advanced-Data-Structures-and-Algorithms
+
+This is the work completed from Advanced Datastructures and Algorithms
